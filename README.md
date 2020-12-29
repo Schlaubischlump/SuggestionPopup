@@ -16,6 +16,10 @@ var searchCompleter: LocationSearchCompleter!
 // Somewhere in your constructor create a LocationSearchCompleter with 
 // your textField. You can still use the textField delegate !
 self.searchCompleter = LocationSearchCompleter(searchField: searchField)
+self.searchCompleter.onShow = { ... }
+self.searchCompleter.onHide = { ... }
+self.searchCompleter.onHighlight = { ... }
+self.searchCompleter.onSelect = { ... }
 ```
 
 If you want a custom search things are a little bit more difficult. 
