@@ -66,4 +66,8 @@ extension LocationSearchCompleter: MKLocalSearchCompleterDelegate {
     public func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         self.setSuggestions(self.searchCompleter.results)
     }
+
+    public func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        self.setSuggestions([])
+    }
 }

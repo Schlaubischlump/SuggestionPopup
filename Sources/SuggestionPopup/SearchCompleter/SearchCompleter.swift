@@ -5,10 +5,6 @@
 //  Created by David Klopp on 26.12.20.
 //
 
-// TODO:
-// Bug 2: Sometimes the text entry is broken when removing characters
-// Bug 3: Hovering over a cell while deleting breaks the deleting mechanism. (This is the same as bug 2)
-
 import AppKit
 
 open class SearchCompleter: NSObject, KeyResponder {
@@ -29,6 +25,9 @@ open class SearchCompleter: NSObject, KeyResponder {
 
     /// A reference to the textDidChange observer.
     private var textDidChangeObserver: NSObjectProtocol?
+
+    /// A reference to the
+    private var windowObserver: NSKeyValueObservation?
 
     /// A reference to the window didResignKey observer.
     private var lostFocusObserver: Any?
@@ -158,10 +157,34 @@ open class SearchCompleter: NSObject, KeyResponder {
                 self?.windowController.hide()
             } else {
                 self?.prepareSuggestions(for: text)
-                // Show the autocomplete window and start a progress spinner.
+                // Show the autocomplete window.
                 self?.windowController.show()
             }
         }
+
+        self.windowObserver = self.searchField.observe(\.window?.firstResponder) { [weak self] searchField, _ in
+            // KVO is strange... this called every time the first responder changes, but old and new is always nil.
+            let firstResponder = searchField.window?.firstResponder
+            guard searchField.currentEditor() == firstResponder else { return }
+            // Show the window if the searchField contains any text.
+            let text = searchField.stringValue
+            if !text.isEmpty {
+                //self?.prepareSuggestions(for: text)
+                self?.windowController.show()
+            }
+        }
+        //self.searchField.window
+
+        /*self.textDidBeginEditingObserver = NotificationCenter.default.addObserver(
+            forName: NSControl.,
+            object: self.searchField, queue: .main) { [weak self] _ in
+            print("editing")
+            let text = self?.searchField.stringValue ?? ""
+            if !text.isEmpty {
+                self?.prepareSuggestions(for: text)
+                self?.windowController.show()
+            }
+        }*/
     }
 
     private func unregisterTextFieldNotifications() {
@@ -169,6 +192,9 @@ open class SearchCompleter: NSObject, KeyResponder {
             NotificationCenter.default.removeObserver(observer)
         }
         self.textDidChangeObserver = nil
+
+        self.windowObserver?.invalidate()
+        self.windowObserver = nil
     }
 
     // MARK: - Focus

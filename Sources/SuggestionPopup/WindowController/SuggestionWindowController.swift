@@ -6,6 +6,8 @@
 //
 import AppKit
 
+// TODO: On textField becomes first responder, show the popup.
+
 class SuggestionWindowController: NSWindowController, KeyResponder {
     /// The textfield instance to manage.
     private weak var searchField: NSTextField!
@@ -43,7 +45,11 @@ class SuggestionWindowController: NSWindowController, KeyResponder {
         contentViewController?.action = #selector(self.selectedSuggestion(_:))
 
         // Listen for text changes inside the textField.
-        self.registerNotifications()
+        self.registerTextDidChangeNotifications()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("InitWithCoder not supported.")
     }
 
 
@@ -53,29 +59,27 @@ class SuggestionWindowController: NSWindowController, KeyResponder {
         if let observer = self.textDidChangeObserver {
             NotificationCenter.default.removeObserver(observer)
         }
-        if let observer = self.selecionChangedObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
         self.textDidChangeObserver = nil
-        self.selecionChangedObserver = nil
     }
 
     // MARK: - TextField
 
-    private func registerNotifications() {
+    private func registerTextDidChangeNotifications() {
         let center = NotificationCenter.default
-
         self.textDidChangeObserver = center.addObserver(forName: NSTextField.textDidChangeNotification,
                                                         object: self.searchField,
                                                         queue: .main) { [weak self] _ in
             // Save the current search query.
             self?.searchQuery = self?.searchField.stringValue ?? ""
         }
+    }
 
+    func registerCellSelectionNotification() {
         // Listen for tableView cell highlighting.
         guard let contentViewController = self.contentViewController as? SuggestionListViewController else {
             return
         }
+        let center = NotificationCenter.default
         let tableView = contentViewController.contentView.tableView
         self.selecionChangedObserver = center.addObserver(forName: NSTableView.selectionDidChangeNotification,
                                                           object: tableView,
@@ -104,8 +108,11 @@ class SuggestionWindowController: NSWindowController, KeyResponder {
         }
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("InitWithCoder not supported.")
+    func unregisterCellSelectionNotification() {
+        if let observer = self.selecionChangedObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        self.selecionChangedObserver = nil
     }
 
     // MARK: - Selection
@@ -113,6 +120,9 @@ class SuggestionWindowController: NSWindowController, KeyResponder {
     @objc private func selectedSuggestion(_ suggestion: AnyObject) {
         guard let suggestion = suggestion as? Suggestion else { return }
         self.onSelect?(self.searchQuery, suggestion)
+        // Update the searchField text, after the window is dismissed. That way the the cell seletion callback
+        // won't fire.
+        self.searchField.stringValue = suggestion.title
     }
 
     // MARK: - Show / Hide
@@ -137,6 +147,9 @@ class SuggestionWindowController: NSWindowController, KeyResponder {
         window.setFrameTopLeftPoint(location)
         // Show the window
         parentWindow.addChildWindow(window, ordered: .above)
+        // Liste for cell selection events.
+        self.registerCellSelectionNotification()
+        // Perform the callback.
         self.onShow?()
         return true
     }
@@ -147,6 +160,9 @@ class SuggestionWindowController: NSWindowController, KeyResponder {
         guard let window = self.window, window.isVisible else { return false }
         window.parent?.removeChildWindow(window)
         window.orderOut(nil)
+        // Stop listening for cell selection.
+        self.unregisterCellSelectionNotification()
+        // Perform the callback.
         self.onHide?()
         return true
     }
