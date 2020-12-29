@@ -7,7 +7,7 @@ This is a suggestion popup implementation similar to the one used by the `Maps.a
 <img src="screenshot.png" width="300" />
 
 Usage:    
-If you just one to have a simple location search, things are easy:
+If you just want to have a simple location search, things are easy:
 
 ``` Swift
 // Keep a reference to the search completer in memory.
@@ -22,7 +22,7 @@ self.searchCompleter.onHighlight = { ... }
 self.searchCompleter.onSelect = { ... }
 ```
 
-If you want a custom search things are a little bit more difficult. 
+If you want a custom search, things are a little bit more difficult. 
 
 ``` Swift
 // Create or implement a new class based on NSObject which conforms
