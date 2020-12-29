@@ -2,7 +2,7 @@
 
 [![License: GNU Affero General Public license version 3](https://img.shields.io/badge/License-LGPLv3-blue.svg)](https://opensource.org/licenses/lgpl-3.0)
 
-This is a suggestion popup implementation similar to the one used by the `Maps.app` on macOS 10.15. It is provided under the GNU Lesser General Public License v3.0. I only tested it on macOS 10.15. MacOS 10.13-11.0 could work. I will test this in the future and make it compatible, if required. This software is still in beta.
+This is a suggestion popup implementation similar to the one used by the `Maps.app` on macOS 10.15. It is provided under the GNU Lesser General Public License v3.0. I only tested it on macOS 10.15, 11.0. MacOS 10.13-10.14 could work. I will test this in the future and make it compatible, if required. This software is still in beta.
 
 <img src="screenshot.png" width="300" />
 
