@@ -11,10 +11,17 @@ open class SearchCompleter: NSObject, KeyResponder {
     /// The main searchField instance.
     public weak var searchField: NSTextField!
 
-    /// Window events.
+    /// Called when the searchField the first responder.
+    public var onBecomeFirstReponder: SuggestionFirstResponderAction?
+    /// Called when the searchField the first responder.
+    public var onResignFirstReponder: SuggestionFirstResponderAction?
+    /// Called when the window is shown.
     public var onShow: SuggestionShowAction?
+    /// Called when the window is hidden.
     public var onHide: SuggestionHideAction?
+    /// Called when a suggestion is selected.
     public var onSelect: SuggestionSelectAction?
+    /// Called when a suggestion is highlighted, but not yet selected..
     public var onHighlight: SuggestionHighlightAction? {
         get { return self.windowController.onHighlight }
         set { self.windowController.onHighlight = newValue }
@@ -37,6 +44,9 @@ open class SearchCompleter: NSObject, KeyResponder {
 
     /// The internal monitor to capture mouse events.
     private var localMouseDownEventMonitor: Any?
+
+    /// Is the searchField currently the first responder.
+    private var searchFieldIsFirstResponder: Bool = false
 
     // MARK: - Constructor
 
@@ -165,26 +175,22 @@ open class SearchCompleter: NSObject, KeyResponder {
         self.windowObserver = self.searchField.observe(\.window?.firstResponder) { [weak self] searchField, _ in
             // KVO is strange... this called every time the first responder changes, but old and new is always nil.
             let firstResponder = searchField.window?.firstResponder
-            guard searchField.currentEditor() == firstResponder else { return }
+            guard searchField.currentEditor() == firstResponder else {
+                if self?.searchFieldIsFirstResponder ?? false {
+                    self?.onResignFirstReponder?()
+                    self?.searchFieldIsFirstResponder = false
+                }
+                return
+            }
             // Show the window if the searchField contains any text.
             let text = searchField.stringValue
             if !text.isEmpty {
                 //self?.prepareSuggestions(for: text)
                 self?.windowController.show()
             }
+            self?.searchFieldIsFirstResponder = true
+            self?.onBecomeFirstReponder?()
         }
-        //self.searchField.window
-
-        /*self.textDidBeginEditingObserver = NotificationCenter.default.addObserver(
-            forName: NSControl.,
-            object: self.searchField, queue: .main) { [weak self] _ in
-            print("editing")
-            let text = self?.searchField.stringValue ?? ""
-            if !text.isEmpty {
-                self?.prepareSuggestions(for: text)
-                self?.windowController.show()
-            }
-        }*/
     }
 
     private func unregisterTextFieldNotifications() {

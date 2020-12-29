@@ -7,10 +7,11 @@
 
 import AppKit
 
-public typealias SuggestionSelectAction    = ((String, Suggestion) -> Void)
-public typealias SuggestionHighlightAction = ((String, Suggestion?) -> Void)
-public typealias SuggestionShowAction      = (() -> Void)
-public typealias SuggestionHideAction      = (() -> Void)
+public typealias SuggestionSelectAction         = ((String, Suggestion) -> Void)
+public typealias SuggestionHighlightAction      = ((String, Suggestion?) -> Void)
+public typealias SuggestionShowAction           = (() -> Void)
+public typealias SuggestionHideAction           = (() -> Void)
+public typealias SuggestionFirstResponderAction = (() -> Void)
 
 /// Your class must conform to this protocol to be displayed in the suggestion list.
 public protocol Suggestion: NSObject {
