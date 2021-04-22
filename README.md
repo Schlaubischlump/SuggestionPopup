@@ -61,7 +61,7 @@ class SimpleSearchCompleter: SearchCompleter {
 	// and end the function with a `setSuggestions` call.
 	override func prepareSuggestions(for searchString: String) {
 		//self.showSpinner()
-		super. prepareSuggestions(for: searchString)
+		super.prepareSuggestions(for: searchString)
 	}
   
 	// Call this function to show the search result. You might override
