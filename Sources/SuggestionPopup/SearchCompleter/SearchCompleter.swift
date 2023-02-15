@@ -10,7 +10,11 @@ import AppKit
 open class SearchCompleter: NSObject, KeyResponder {
     /// The main searchField instance.
     public weak var searchField: NSTextField!
-
+    /// The minimum width of the window.
+    public var minimumWindowWidth: CGFloat {
+        get { return self.windowController?.minimumWindowWidth ?? 0 }
+        set { self.windowController?.minimumWindowWidth = newValue }
+    }
     /// Called when the searchField the first responder.
     public var onBecomeFirstReponder: SuggestionFirstResponderAction?
     /// Called when the searchField the first responder.

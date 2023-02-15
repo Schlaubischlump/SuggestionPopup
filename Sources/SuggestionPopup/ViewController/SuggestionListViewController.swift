@@ -29,9 +29,11 @@ class SuggestionListViewController: NSViewController, KeyResponder {
         // Add the effect view.
         let effectView = NSVisualEffectView(frame: containerView.bounds)
         effectView.autoresizingMask = [.height, .width]
-        effectView.isEmphasized = false
+        effectView.isEmphasized = true
         effectView.state = .active
-        if #available(OSX 10.14, *) {
+        if #available(OSX 11.0, *) {
+            effectView.material = .hudWindow
+        } else if #available(OSX 10.14, *) {
             effectView.material = .underWindowBackground
         } else {
             effectView.material = .titlebar

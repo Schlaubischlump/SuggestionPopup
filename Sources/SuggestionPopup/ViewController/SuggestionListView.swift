@@ -18,12 +18,14 @@ class SuggestionListView: NSScrollView {
 
         // Setup the tableView.
         self.tableView = NSTableView(frame: .zero)
+        var insetBottom: CGFloat = 5
         if #available(OSX 11.0, *) {
-            self.tableView.style = .fullWidth
+            self.tableView.style = .sourceList
+            insetBottom = 10
         }
-        self.tableView.selectionHighlightStyle = NSTableView.SelectionHighlightStyle.regular
+        self.tableView.selectionHighlightStyle = .regular
         self.tableView.backgroundColor = .clear
-        self.tableView.rowSizeStyle = NSTableView.RowSizeStyle.custom
+        self.tableView.rowSizeStyle = .custom
         self.tableView.rowHeight = 36.0
         self.tableView.intercellSpacing = NSSize(width: 5.0, height: 0.0)
         self.tableView.headerView = nil
@@ -38,8 +40,12 @@ class SuggestionListView: NSScrollView {
         self.documentView = self.tableView
         self.hasVerticalScroller = true
         self.hasHorizontalScroller = false
+        self.autohidesScrollers = true
+        self.scrollerStyle = .overlay
+        self.verticalScroller?.controlSize = .small
         self.automaticallyAdjustsContentInsets = false
-        self.contentInsets = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        self.contentInsets = NSEdgeInsets(top: 0, left: 0, bottom: insetBottom, right: 0)
+        self.scrollerInsets = NSEdgeInsets(top: 0, left: 0, bottom: -insetBottom, right: 0)
     }
 
     required init?(coder: NSCoder) {
@@ -50,8 +56,9 @@ class SuggestionListView: NSScrollView {
 
     override func layout() {
         super.layout()
-        self.tableView.frame.size.width = self.frame.width
-        self.column.width = self.tableView.frame.width
+        let width = self.frame.width
+        self.tableView.frame.size.width = width
+        //self.column.width = width
     }
 
     // MARK: - Helper

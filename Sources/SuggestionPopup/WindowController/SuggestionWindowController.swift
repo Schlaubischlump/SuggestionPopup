@@ -9,6 +9,9 @@ import AppKit
 // TODO: On textField becomes first responder, show the popup.
 
 class SuggestionWindowController: NSWindowController, KeyResponder {
+    /// The minimum width of the window.
+    internal var minimumWindowWidth: CGFloat = 0
+
     /// The textfield instance to manage.
     private weak var searchField: NSTextField!
 
@@ -137,7 +140,7 @@ class SuggestionWindowController: NSWindowController, KeyResponder {
               let searchFieldParent = self.searchField.superview else { return false }
         // The window has the same width as the searchField.
         var frame = window.frame
-        frame.size.width = self.searchField.frame.width
+        frame.size.width = max(self.searchField.frame.width, self.minimumWindowWidth)
         // Position the window directly below the searchField.
         var location = searchFieldParent.convert(self.searchField.frame.origin, to: nil)
         location = parentWindow.convertToScreen(CGRect(x: location.x, y: location.y, width: 0, height: 0)).origin
