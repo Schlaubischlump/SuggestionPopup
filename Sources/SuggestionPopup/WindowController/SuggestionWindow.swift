@@ -48,9 +48,8 @@ class SuggestionWindow: NSWindow {
         contentViewController?.setSuggestions(suggestions)
         // Update the content size.
         let contentSize = contentViewController?.getSuggestedWindowSize() ?? .zero
-        let topLeftPoint = CGPoint(x: self.frame.minX, y: self.frame.maxY)
-        self.setContentSize(contentSize)
-        self.setFrameTopLeftPoint(topLeftPoint)
+        let bottomLeftPoint = CGPoint(x: self.frame.minX, y: self.frame.maxY - contentSize.height)
+        self.setFrame(CGRect(origin: bottomLeftPoint, size: contentSize), display: true)
     }
 }
 

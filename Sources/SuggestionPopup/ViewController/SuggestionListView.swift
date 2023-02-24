@@ -13,6 +13,12 @@ class SuggestionListView: NSScrollView {
     /// The main table view column.
     var column: NSTableColumn!
 
+    /// Always force overlay style, even on 10.15.x, 11.x and 12.x
+    override var scrollerStyle: NSScroller.Style {
+        get { return .overlay }
+        set { }
+    }
+
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
 
@@ -20,9 +26,13 @@ class SuggestionListView: NSScrollView {
         self.tableView = NSTableView(frame: .zero)
         var insetBottom: CGFloat = 5
         if #available(OSX 11.0, *) {
-            self.tableView.style = .sourceList
+            self.tableView.style = .inset
+            insetBottom = 0
+        } else if #available(OSX 13.0, *) {
+            self.tableView.style = .inset
             insetBottom = 10
         }
+
         self.tableView.selectionHighlightStyle = .regular
         self.tableView.backgroundColor = .clear
         self.tableView.rowSizeStyle = .custom
@@ -36,13 +46,12 @@ class SuggestionListView: NSScrollView {
         self.tableView.addTableColumn(self.column)
 
         // Setup the scrollView.
-        self.drawsBackground = false
         self.documentView = self.tableView
+
+        self.drawsBackground = false
         self.hasVerticalScroller = true
         self.hasHorizontalScroller = false
-        self.autohidesScrollers = true
-        self.scrollerStyle = .overlay
-        self.verticalScroller?.controlSize = .small
+        //self.verticalScroller?.controlSize = .small
         self.automaticallyAdjustsContentInsets = false
         self.contentInsets = NSEdgeInsets(top: 0, left: 0, bottom: insetBottom, right: 0)
         self.scrollerInsets = NSEdgeInsets(top: 0, left: 0, bottom: -insetBottom, right: 0)
@@ -54,11 +63,14 @@ class SuggestionListView: NSScrollView {
 
     // MARK: - Layout
 
+    /// Not required for macOS 10.13 and up
     override func layout() {
         super.layout()
         let width = self.frame.width
+        // fix size on macOS Big Sur
+        self.tableView.sizeToFit()
         self.tableView.frame.size.width = width
-        //self.column.width = width
+        self.contentView.frame.size.width = width
     }
 
     // MARK: - Helper
