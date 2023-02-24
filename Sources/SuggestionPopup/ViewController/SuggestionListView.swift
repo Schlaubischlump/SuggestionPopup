@@ -25,12 +25,12 @@ class SuggestionListView: NSScrollView {
         // Setup the tableView.
         self.tableView = NSTableView(frame: .zero)
         var insetBottom: CGFloat = 5
-        if #available(OSX 11.0, *) {
-            self.tableView.style = .inset
-            insetBottom = 0
-        } else if #available(OSX 13.0, *) {
+        if #available(OSX 13.0, *) {
             self.tableView.style = .inset
             insetBottom = 10
+        } else if #available(OSX 11.0, *) {
+            self.tableView.style = .inset
+            insetBottom = 0
         }
 
         self.tableView.selectionHighlightStyle = .regular
